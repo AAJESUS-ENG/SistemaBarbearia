@@ -1,0 +1,33 @@
+import os
+from datetime import datetime
+
+DATA_FILE = "data_store.txt"
+
+def load_data():
+    items = []
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    items.append(line.strip())
+    return items
+
+def save_data(items):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        for item in items:
+            f.write(item + "\n")
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def format_currency(value):
+    return f"R$ {float(value):.2f}"
+
+def render_list(items):
+    clear_screen()
+    print(f"{'ID':<4} | {'HORA':<6} | {'CLIENTE':<15} | {'SERVIÇO':<12} | {'STATUS'}")
+    print("-" * 60)
+    for i, entry in enumerate(items, 1):
+        p = entry.split(" | ")
+        # Nome | Servico | Preco | Barbeiro | Status | Hora
+        print(f"{i:<4} | {p[5]:<6} | {p[0]:<15} | {p[1]:<12} | {p[4]}")
