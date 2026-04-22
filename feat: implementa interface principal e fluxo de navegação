@@ -1,0 +1,84 @@
+from funcoes import *
+
+def bootstrap():
+    records = load_data()
+    
+    while True:
+        print("\n>>> BARBER CONTROL SYSTEM v1.0 <<<")
+        print("1. Agendar Cliente")
+        print("2. Fila de Espera")
+        print("3. Atualizar Status")
+        print("4. Relatório Financeiro")
+        print("5. Remover Registro")
+        print("0. Sair")
+        
+        choice = input("\nSelecione uma operação: ")
+
+        if choice == "1":
+            nome = input("Cliente: ").strip().capitalize()
+            servico = input("Serviço (Corte/Barba/Combo): ").strip()
+            preco = input("Valor cobrado: ")
+            barbeiro = input("Profissional: ").strip().capitalize()
+            hora = datetime.now().strftime("%H:%M")
+            
+            # Padronização da String de dados
+            raw_string = f"{nome} | {servico} | {preco} | {barbeiro} | Aguardando | {hora}"
+            records.append(raw_string)
+            save_data(records)
+            print(">> OK: Registrado com sucesso.")
+
+        elif choice == "2":
+            render_list(records)
+            input("\n[Pressione Enter para voltar]")
+
+        elif choice == "3":
+            render_list(records)
+            try:
+                idx = int(input("\nID do atendimento para atualizar: ")) - 1
+                if 0 <= idx < len(records):
+                    p = records[idx].split(" | ")
+                    print(f"\nStatus atual: {p[4]}")
+                    print("Novos: [1] Em andamento | [2] Finalizado | [3] Cancelado")
+                    st_choice = input("Opção: ")
+                    
+                    mapa = {"1": "Em andamento", "2": "Finalizado", "3": "Cancelado"}
+                    p[4] = mapa.get(st_choice, p[4])
+                    
+                    records[idx] = " | ".join(p)
+                    save_data(records)
+                    print(">> OK: Status atualizado.")
+            except ValueError:
+                print(">> Erro: Entrada inválida.")
+
+        elif choice == "4":
+            clear_screen()
+            total_bruto = 0
+            print("--- FECHAMENTO DE CAIXA ---")
+            for item in records:
+                p = item.split(" | ")
+                if p[4] == "Finalizado":
+                    val = float(p[2])
+                    total_bruto += val
+                    print(f"Finalizado: {p[0]} - {format_currency(val)}")
+            
+            print(f"\nFATURAMENTO: {format_currency(total_bruto)}")
+            print(f"COMISSÃO (50%): {format_currency(total_bruto * 0.5)}")
+            input("\n[Pressione Enter para voltar]")
+
+        elif choice == "5":
+            render_list(records)
+            try:
+                idx = int(input("\nID para excluir permanentemente: ")) - 1
+                if 0 <= idx < len(records):
+                    records.pop(idx)
+                    save_data(records)
+                    print(">> OK: Registro removido.")
+            except:
+                pass
+
+        elif choice == "0":
+            print("Sistema encerrado.")
+            break
+
+if __name__ == "__main__":
+    bootstrap()
